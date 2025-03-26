@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -25,8 +25,7 @@ SECRET_KEY = "django-insecure-27fbnf3w7&eu14)bmw6327&wmz(7m1yi@*xj&*cto5ggtz%p%&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['tester-rwlg.onrender.com']
-
+ALLOWED_HOSTS = ['tester-rwlg.onrender.com', '127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -48,15 +47,15 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware"
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
-ROOT_URLCONF = "myapp.urls"
+ROOT_URLCONF = "myapp.urls"  # Updated from my_nifty_project.urls
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'templates')],  # Added from niftyscenarios
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -69,8 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "myapp.wsgi.application"
-
+WSGI_APPLICATION = "myapp.wsgi.application"  # Updated from my_nifty_project.wsgi.application
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -81,7 +79,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -101,7 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -113,11 +109,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")  # Added from niftyscenarios for production
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static_dev")]  # Optional for development, adjusted naming
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

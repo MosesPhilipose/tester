@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Analysis Dashboard</title>
+    <link rel="stylesheet" href="/static/indexstats/css/styles.css">
+    <!-- Add PDF and CSV export libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>📊 Market Analysis Dashboard</h1>
+        <div class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+            <span class="icon sun">☀️</span>
+            <span class="icon moon">🌙</span>
+            <div class="toggle-circle"></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <p id="lastUpdated">Last Updated: </p>
+
+        <!-- Search Input -->
+        <input type="text" id="searchInput" placeholder="🔍 Search by Symbol..." onkeyup="filterTable()" aria-label="Search Symbols">
+
+        <!-- Refresh Data Button -->
+        <button class="refresh-btn" id="refreshData" aria-label="Refresh Data">🔄 Refresh Data</button>
+
+        <!-- Market Table -->
+        <div class="table-container">
+            <div class="spinner" id="loadingSpinner">Loading...</div>
+            <table id="marketTable" aria-sort="ascending">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)" aria-sort="none">Symbol</th>
+                        <th onclick="sortTable(1)" aria-sort="none">Opening Scenario</th>
+                        <th onclick="sortTable(2)" aria-sort="none">Trend Observed</th>
+                        <th onclick="sortTable(3)" aria-sort="none">Upward Close (%)</th>
+                        <th onclick="sortTable(4)" aria-sort="none">Downward Close (%)</th>
+                        <th onclick="sortTable(5)" aria-sort="none">Flat Close (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be dynamically populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="buttons" style="margin-top: 10px;">
+            <button class="btn export-btn" id="exportCSV" aria-label="Export CSV">📄 Export CSV</button>
+            <button class="btn export-btn" id="exportPDF" aria-label="Export PDF">📑 Export PDF</button>
+        </div>
+    </div>
+
+    <script>
+        const jsonDataUrl = "/static/indexstats/data.json"; // Path to the JSON file
+
+        // Fetch data from the JSON file and populate the table
+        async function fetchData() {
+            try {
+                console.log("Fetching JSON from:", jsonDataUrl);
+
+                const response = await fetch(jsonDataUrl);
+                console.log("Response Status:", response.status); // Check if it's 200
+                console.log("Response Headers:", response.headers);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Fetched Data:", data); // Debugging the data
+                document.getElementById("lastUpdated").textContent = data["Data Generated On"];
+                const tbody = document.querySelector("#marketTable tbody");
+                tbody.innerHTML = ""; // Clear existing rows
+                data["Tickers"].forEach(ticker => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${ticker["Symbol"]}</td>
+                        <td>${ticker["Opening Scenario"]}</td>
+                        <td>${ticker["Trend Observed"]}</td>
+                        <td>${ticker["Upward Close"]}%</td>
+                        <td>${ticker["Downward Close"]}%</td>
+                        <td>${ticker["Flat Close"]}%</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                document.getElementById("marketTable").classList.add("show"); // Show the table
+                document.getElementById("loadingSpinner").style.visibility = "hidden"; // Hide spinner
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                alert("Failed to load data. Please try again.");
+            }
+        }
+
+        // Call fetchData on page load
+        window.onload = () => {
+            fetchData();
+        };
+
+        // Refresh Data Button
+        document.getElementById("refreshData").addEventListener("click", () => {
+            fetch("/refresh-data/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.status === "success") {
+                        setTimeout(() => {
+                            location.reload(); // Reload the page after 20 seconds
+                        }, 20000);
+                    } else {
+                        alert(`Error: ${data.message}`);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error refreshing data:", error);
+                    alert("Failed to refresh data. Please try again.");
+                });
+        });
+
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + "=") {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Filter table based on search input
+        function filterTable() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#marketTable tbody tr");
+            rows.forEach(row => {
+                const symbol = row.cells[0].textContent.toLowerCase();
+                row.style.display = symbol.includes(input) ? "" : "none";
+            });
+        }
+
+        // Sort table columns
+        function sortTable(columnIndex) {
+            const table = document.getElementById("marketTable");
+            const rows = Array.from(table.rows).slice(1); // Exclude header row
+            const isAscending = table.getAttribute("aria-sort") === "ascending";
+            rows.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim().toLowerCase();
+                const bValue = b.cells[columnIndex].textContent.trim().toLowerCase();
+                if (!isNaN(aValue) && !isNaN(bValue)) {
+                    return isAscending ? parseFloat(aValue) - parseFloat(bValue) : parseFloat(bValue) - parseFloat(aValue);
+                } else {
+                    return isAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                }
+            });
+            rows.forEach(row => table.tBodies[0].appendChild(row));
+            table.setAttribute("aria-sort", isAscending ? "descending" : "ascending");
+        }
+
+        // Dark Mode Toggle
+        document.getElementById("themeToggle").addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+        });
+
+        // Export to CSV
+        document.getElementById("exportCSV").addEventListener("click", () => {
+            const rows = document.querySelectorAll("#marketTable tbody tr");
+            let csvContent = "data:text/csv;charset=utf-8,";
+
+            // Add header row
+            const headers = ["Symbol", "Opening Scenario", "Trend Observed", "Upward Close (%)", "Downward Close (%)", "Flat Close (%)"];
+            csvContent += headers.join(",") + "\n";
+
+            // Add data rows
+            rows.forEach(row => {
+                const rowData = Array.from(row.cells).map(cell => cell.textContent.replace(/%/g, ""));
+                csvContent += rowData.join(",") + "\n";
+            });
+
+            // Create and download the CSV file
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "market_analysis.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Export to PDF
+        document.getElementById("exportPDF").addEventListener("click", () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Extract table data
+            const rows = document.querySelectorAll("#marketTable tbody tr");
+            const headers = ["Symbol", "Opening Scenario", "Trend Observed", "Upward Close (%)", "Downward Close (%)", "Flat Close (%)"];
+            const data = [];
+            rows.forEach(row => {
+                const rowData = Array.from(row.cells).map(cell => cell.textContent.replace(/%/g, ""));
+                data.push(rowData);
+            });
+
+            // Generate PDF with auto-table
+            doc.autoTable({
+                head: [headers],
+                body: data,
+                theme: "grid",
+                styles: { fontSize: 8 },
+                margin: { top: 20 },
+                didDrawPage: function (dataArg) {
+                    doc.text("Market Analysis Report", 14, 15);
+                },
+            });
+
+            // Save the PDF
+            doc.save("market_analysis.pdf");
+        });
+    </script>
+</body>
+</html>
