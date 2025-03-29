@@ -56,12 +56,12 @@
     </div>
 
     <script>
-        const jsonDataUrl = "/static/indexstats/data.json"; // Path to the JSON file
+        const jsonDataUrl = "/ticker-data/"; // Updated to dynamic endpoint
 
-        // Fetch data from the JSON file and populate the table
+        // Fetch data from the SQLite backend and populate the table
         async function fetchData() {
             try {
-                console.log("Fetching JSON from:", jsonDataUrl);
+                console.log("Fetching data from:", jsonDataUrl);
 
                 const response = await fetch(jsonDataUrl);
                 console.log("Response Status:", response.status); // Check if it's 200
@@ -71,7 +71,17 @@
                 }
                 const data = await response.json();
                 console.log("Fetched Data:", data); // Debugging the data
-                document.getElementById("lastUpdated").textContent = data["Data Generated On"];
+
+                // Handle no-data case
+                if (data.status === "no_data") {
+                    document.getElementById("lastUpdated").textContent = data.message;
+                    document.querySelector("#marketTable tbody").innerHTML = "";
+                    document.getElementById("marketTable").classList.remove("show");
+                    document.getElementById("loadingSpinner").style.visibility = "hidden";
+                    return;
+                }
+
+                document.getElementById("lastUpdated").textContent = data["Generated on"];
                 const tbody = document.querySelector("#marketTable tbody");
                 tbody.innerHTML = ""; // Clear existing rows
                 data["Tickers"].forEach(ticker => {
@@ -111,9 +121,7 @@
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.status === "success") {
-                        setTimeout(() => {
-                            location.reload(); // Reload the page after 20 seconds
-                        }, 20000);
+                        fetchData(); // Refresh table immediately instead of reloading
                     } else {
                         alert(`Error: ${data.message}`);
                     }
@@ -156,8 +164,8 @@
             const rows = Array.from(table.rows).slice(1); // Exclude header row
             const isAscending = table.getAttribute("aria-sort") === "ascending";
             rows.sort((a, b) => {
-                const aValue = a.cells[columnIndex].textContent.trim().toLowerCase();
-                const bValue = b.cells[columnIndex].textContent.trim().toLowerCase();
+                const aValue = a.cells[columnIndex].textContent.trim().replace('%', '').toLowerCase();
+                const bValue = b.cells[columnIndex].textContent.trim().replace('%', '').toLowerCase();
                 if (!isNaN(aValue) && !isNaN(bValue)) {
                     return isAscending ? parseFloat(aValue) - parseFloat(bValue) : parseFloat(bValue) - parseFloat(aValue);
                 } else {
