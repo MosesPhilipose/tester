@@ -93,31 +93,31 @@ class OHLCAnalysis:
         if ((opening_per >= 0 and low_per >= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
             (opening_per > 0.25 and low_per >= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
             (-0.25 <= opening_per <= 0.25 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1 and
-             not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1) or
+            not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1) or
             (opening_per < 0 and high_per > m1 and not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1)):
             return "Up Trend"
         elif ((opening_per >= 0 and low_per <= -m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
-              (opening_per > 0.25 and low_per <= -m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
-              (-0.25 <= opening_per <= 0.25 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1 and
-               not pd.isna(low_per_opening_per) and low_per_opening_per < -n1) or
-              (opening_per < 0 and high_per <= -m1 and not pd.isna(low_per_opening_per) and low_per_opening_per < -n1)):
+            (opening_per > 0.25 and low_per <= -m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
+            (-0.25 <= opening_per <= 0.25 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1 and
+            not pd.isna(low_per_opening_per) and low_per_opening_per < -n1) or
+            (opening_per < 0 and high_per <= -m1 and not pd.isna(low_per_opening_per) and low_per_opening_per < -n1)):
             return "Down Trend"
         elif ((opening_per >= 0 and low_per > -m1 and low_per < m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
-              (opening_per >= 0 and low_per >= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
-              (opening_per >= 0 and low_per > -m1 and low_per < m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
-              (opening_per >= 0 and low_per <= -m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
-              (opening_per > 0.25 and -m1 <= low_per <= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
-              (opening_per > 0.25 and low_per >= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
-              (opening_per > 0.25 and -m1 <= low_per <= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
-              (opening_per > 0.25 and low_per <= -m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
-              (opening_per < 0 and high_per <= -m1 and not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1) or
-              (opening_per < 0 and high_per > -m1 and high_per <= m1 and not pd.isna(low_per_opening_per) and low_per_opening_per < -n1) or
-              (opening_per < 0 and high_per > -m1 and high_per <= m1 and not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1) or
-              (opening_per < 0 and high_per > m1 and not pd.isna(low_per_opening_per) and low_per_opening_per < -n1) or
-              (opening_per < -0.25 and -m1 <= high_per <= m1 and not pd.isna(low_per_opening_per) and low_per_opening_per < -n1) or
-              (opening_per < -0.25 and -m1 <= high_per <= m1 and not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1) or
-              (-0.25 <= opening_per <= 0.25 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1 and
-               not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1)):
+            (opening_per >= 0 and low_per >= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
+            (opening_per >= 0 and low_per > -m1 and low_per < m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
+            (opening_per >= 0 and low_per <= -m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
+            (opening_per > 0.25 and -m1 <= low_per <= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
+            (opening_per > 0.25 and low_per >= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
+            (opening_per > 0.25 and -m1 <= low_per <= m1 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1) or
+            (opening_per > 0.25 and low_per <= -m1 and not pd.isna(high_per_opening_per) and high_per_opening_per >= n1) or
+            (opening_per < 0 and high_per <= -m1 and not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1) or
+            (opening_per < 0 and high_per > -m1 and high_per <= m1 and not pd.isna(low_per_opening_per) and low_per_opening_per < -n1) or
+            (opening_per < 0 and high_per > -m1 and high_per <= m1 and not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1) or
+            (opening_per < 0 and high_per > m1 and not pd.isna(low_per_opening_per) and low_per_opening_per < -n1) or
+            (opening_per < -0.25 and -m1 <= high_per <= m1 and not pd.isna(low_per_opening_per) and low_per_opening_per < -n1) or
+            (opening_per < -0.25 and -m1 <= high_per <= m1 and not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1) or
+            (-0.25 <= opening_per <= 0.25 and not pd.isna(high_per_opening_per) and high_per_opening_per < n1 and
+            not pd.isna(low_per_opening_per) and low_per_opening_per >= -n1)):
             return "Indecisive"
         return "No Trend"
 
