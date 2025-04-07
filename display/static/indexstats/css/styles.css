@@ -475,7 +475,7 @@ td.neutral {
 
     /* Reduce font size for Symbol column */
     .symbol-cell {
-        font-size: 6px; /* Reduced to a readable smaller size */
+        font-size: 10px; /* Reduced to a readable smaller size */
     }
 
     /* Inherit header widths for data cells */
