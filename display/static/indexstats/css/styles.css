@@ -363,7 +363,7 @@ td.neutral {
     }
 
     .theme-toggle .moon {
-        right: 0px; /* Adjusted to stay inside */
+        right: 1px; /* Adjusted to stay inside */
         margin-top: -1px;
         font-size: 12px; /* Smaller icon */
         color: #ffffff;
