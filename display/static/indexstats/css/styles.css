@@ -6,6 +6,7 @@ body {
     background-color: #f4f4f4;
     color: #333;
     transition: background 0.3s, color 0.3s;
+    font-size: 16px; /* Base font size */
 }
 
 .dark-mode {
@@ -45,6 +46,7 @@ header {
     align-items: center;
     cursor: pointer;
     transition: background 0.3s ease;
+    box-sizing: border-box; /* Include padding in width */
 }
 
 .toggle-circle {
@@ -53,28 +55,30 @@ header {
     height: 20px;
     background-color: white;
     border-radius: 50%;
-    left: 3px;
+    left: 2px; /* Start position adjusted */
     transition: transform 0.3s ease;
+    z-index: 1; /* Lower z-index to be below icons */
 }
 
 .theme-toggle .sun {
     position: absolute;
-    left: 2px;
+    left: 2px; /* Adjusted to stay inside */
     margin-top: -1px;
     font-size: 16px;
     color: #524d39;
-    z-index: 1;
+    z-index: 2; /* Higher z-index to be above circle */
+    transition: opacity 0.3s ease;
 }
 
 .theme-toggle .moon {
     position: absolute;
-    right: 1px;
+    right: 0px; /* Adjusted to stay inside */
     margin-top: -1px;
     font-size: 16px;
     color: #ffffff;
+    z-index: 2; /* Higher z-index to be above circle */
     opacity: 0;
     transition: opacity 0.3s ease;
-    z-index: 1;
 }
 
 .dark-mode .theme-toggle {
@@ -82,7 +86,7 @@ header {
 }
 
 .dark-mode .toggle-circle {
-    transform: translateX(26px);
+    transform: translateX(26px); /* Adjusted to fit within 50px width */
 }
 
 .dark-mode .moon {
@@ -95,13 +99,14 @@ header {
 
 /* Input Search */
 #searchInput {
-    width: 100%;
+    width: 80%;
     max-width: 400px;
     padding: 10px;
     border-radius: 20px;
     border: 1px solid #ccc;
-    margin-bottom: 15px;
+    margin: 0 auto 15px; /* Centered with auto margins, bottom margin only */
     transition: 0.3s;
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 #searchInput:focus {
@@ -146,10 +151,24 @@ header {
     color: white;
 }
 
+.refresh-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.refresh-btn:hover {
+    background-color: #0056b3;
+}
+
 /* Table Styling */
 .table-container {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: hidden; /* Disable horizontal scrolling */
     position: relative;
 }
 
@@ -189,7 +208,7 @@ th, td {
     padding: 12px;
     text-align: left;
     border: 1px solid #ddd;
-    white-space: nowrap;
+    white-space: normal; /* Allow text wrapping */
 }
 
 th {
@@ -238,74 +257,230 @@ td.neutral {
 }
 
 .dark-mode td.positive {
-    color: #00ff00; /* Bright Green for Dark Mode */
+    color: #00ff00;
 }
 
 .dark-mode td.negative {
-    color: #ff4d4d; /* Bright Red for Dark Mode */
+    color: #ff4d4d;
 }
 
 .dark-mode td.neutral {
-    color: #aaa; /* Light Gray for Dark Mode */
+    color: #aaa;
 }
 
-/* Mobile Responsive */
+/* Mobile Responsive - General (up to 768px) */
 @media (max-width: 768px) {
-    
-
-    tbody tr {
-        display: block;
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        padding: 10px;
-        border-radius: 8px;
-        background-color: #fff;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    body {
+        font-size: 14px;
     }
 
-    tbody tr:nth-child(even) {
-        background-color: #f9f9f9;
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .theme-toggle {
+        width: 40px;
+        height: 20px;
+    }
+
+    .toggle-circle {
+        width: 16px;
+        height: 16px;
+    }
+
+    #searchInput {
+        width: 100%;
+        max-width: none;
+        padding: 8px;
+    }
+
+    .btn.export-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+        margin: 5px;
+    }
+
+    .refresh-btn {
+        padding: 8px 16px;
+        width: 100%;
+    }
+}
+
+/* Specific Styling for iPhone 14 Pro Max (430px width) */
+@media (max-width: 430px) {
+    .container {
+        padding: 10px; /* Reduce padding */
+    }
+
+    /* Header Adjustments */
+    header {
+        flex-direction: column; /* Stack header items vertically */
+        align-items: flex-start; /* Align to the left */
+        gap: 10px; /* Space between h1 and toggle */
+        width: 100%; /* Ensure header takes full width */
+        position: relative; /* Context for absolute positioning */
+    }
+
+    h1 {
+        font-size: 18px; /* Reduce font size for mobile */
+        margin: 0; /* Remove default margin */
+    }
+
+    /* Dark Mode Toggle Adjustments */
+    .theme-toggle {
+        width: 40px; /* Smaller width for mobile */
+        height: 20px; /* Smaller height for mobile */
+        margin-left: 0; /* Remove auto margin to control positioning */
+        margin-right: 0; /* Ensure no right overflow */
+        margin-top: 5px; /* Add some space from h1 */
+        box-sizing: border-box; /* Include padding in width */
+        position: absolute; /* Position relative to header */
+        right: 10px; /* Align to the right with padding offset */
+        top: 5px; /* Align with h1 top */
+    }
+
+    .toggle-circle {
+        width: 16px; /* Smaller circle */
+        height: 16px; /* Smaller circle */
+        left: 2px; /* Start position adjusted */
+        transition: transform 0.5s ease;
+        z-index: 1; /* Lower z-index to be below icons */
+    }
+
+    .theme-toggle .sun {
+        left: 1px; /* Adjusted to stay inside */
+        margin-top: -1px;
+        font-size: 12px; /* Smaller icon */
+        color: #524d39;
+        z-index: 2; /* Higher z-index to be above circle */
+        transition: opacity 0.3s ease;
+    }
+
+    .theme-toggle .moon {
+        right: 0px; /* Adjusted to stay inside */
+        margin-top: -1px;
+        font-size: 12px; /* Smaller icon */
+        color: #ffffff;
+        z-index: 2; /* Higher z-index to be above circle */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .dark-mode .theme-toggle {
+        background: #444;
+    }
+
+    .dark-mode .toggle-circle {
+        transform: translateX(20px); /* Reduced to fit within 40px width */
+    }
+
+    .dark-mode .moon {
+        opacity: 1;
+    }
+
+    .dark-mode .sun {
+        opacity: 0;
+    }
+
+    /* Search Input Adjustments */
+    #searchInput {
+        width: 100%; /* Full width within container */
+        max-width: 100%; /* Ensure it doesn’t exceed viewport */
+        padding: 8px 12px; /* Adjusted padding for mobile */
+        font-size: 12px; /* Smaller font size */
+        margin: 0; /* Remove all margins to prevent overflow */
+        margin-bottom: 10px; /* Only bottom margin */
+        border-radius: 15px; /* Slightly smaller radius */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+        box-sizing: border-box; /* Include padding in width */
+    }
+
+    #searchInput:focus {
+        box-shadow: 0 1px 4px rgba(99, 179, 237, 0.5); /* Adjusted focus shadow */
+    }
+
+    /* Refresh Button Adjustments */
+    .refresh-btn {
+        font-size: 12px; /* Consistent font size */
+        padding: 6px 12px; /* Adjusted padding */
+        width: 100%; /* Full width */
+        margin-bottom: 10px; /* Reduced margin */
+    }
+
+    /* Export Buttons Adjustments */
+    .btn.export-btn {
+        padding: 8px 12px; /* Reduced padding */
+        font-size: 12px; /* Smaller font size */
+        margin: 5px; /* Reduced margin */
+        border-radius: 15px; /* Slightly smaller radius */
+    }
+
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px; /* Maintain gap between buttons */
+        justify-content: center; /* Center buttons */
+    }
+
+    /* Table Container and Table Adjustments */
+    .table-container {
+        overflow-x: hidden; /* Disable horizontal scrolling */
+        width: 100%;
+    }
+
+    table {
+        width: 100%; /* Force table to fit viewport */
+        table-layout: fixed; /* Ensure columns are evenly distributed */
+    }
+
+    /* Specific change: Reduce width of table column headers */
+    th {
+        padding: 2px 1px; /* Tighter padding for headers */
+        font-size: 8px; /* Slightly larger font size for readability */
+        white-space: nowrap; /* Prevent wrapping in headers */
+        text-overflow: ellipsis; /* Truncate with ellipsis if too long */
+        overflow: hidden; /* Hide overflow */
+    }
+
+    /* Set specific widths for each column header to fit */
+    th:nth-child(1) { /* Symbol */
+        width: 32%; /* ~131.2px */
+    }
+
+    th:nth-child(2) { /* Upward Close */
+        width: 22%; /* ~90.2px */
+    }
+
+    th:nth-child(3) { /* Downward Close */
+        width: 22%; /* ~90.2px */
+    }
+
+    th:nth-child(4) { /* Flat Close */
+        width: 24%; /* ~98.4px */
     }
 
     td {
-        /* display: block; */
-        text-align: left;
-        padding-left: 0;
-        margin-bottom: 5px;
+        padding: 4px 2px; /* Tighter padding for cells */
+        font-size: 8px; /* Smaller font size for cells */
+        white-space: normal; /* Allow text wrapping */
+        word-wrap: break-word; /* Ensure long words break */
+        box-sizing: border-box; /* Include padding in width */
     }
 
-    td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        margin-right: 10px;
-        color: #63b3ed;
+    /* Reduce font size for Symbol column */
+    .symbol-cell {
+        font-size: 6px; /* Reduced to a readable smaller size */
     }
 
-    /* Dark Mode Adjustments for Mobile */
-    .dark-mode tbody tr {
-        background-color: #181818;
-        color: #f1f1f1;
-    }
-
-    .dark-mode tbody tr:nth-child(even) {
-        background-color: #2c2c2c;
-    }
-
-    .dark-mode td::before {
-        color: #63b3ed;
-    }
-}
-
-.refresh-btn {
-    background-color: #007bff; /* Blue color */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-.refresh-btn:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    /* Inherit header widths for data cells */
+    td:nth-child(1) { width: 32%; }
+    td:nth-child(2) { width: 22%; }
+    td:nth-child(3) { width: 22%; }
+    td:nth-child(4) { width: 24%; }
 }
