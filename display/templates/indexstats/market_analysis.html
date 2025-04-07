@@ -4,42 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Analysis Dashboard</title>
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="/static/indexstats/css/styles.css">
-    <!-- Add PDF and CSV export libraries -->
+    <!-- PDF and CSV Export Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
     <header>
         <h1>📊 Market Analysis Dashboard</h1>
+        <!-- Dark Mode Toggle -->
         <div class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
             <span class="icon sun">☀️</span>
             <span class="icon moon">🌙</span>
             <div class="toggle-circle"></div>
         </div>
     </header>
-
     <div class="container">
+        <!-- Last Updated Information -->
         <p id="lastUpdated">Last Updated: </p>
-
         <!-- Search Input -->
         <input type="text" id="searchInput" placeholder="🔍 Search by Symbol..." onkeyup="filterTable()" aria-label="Search Symbols">
-
         <!-- Refresh Data Button -->
         <button class="refresh-btn" id="refreshData" aria-label="Refresh Data">🔄 Refresh Data</button>
-
         <!-- Market Table -->
         <div class="table-container">
             <div class="spinner" id="loadingSpinner">Loading...</div>
             <table id="marketTable" aria-sort="ascending">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)" aria-sort="none">Symbol</th>
-                        <th onclick="sortTable(1)" aria-sort="none">Opening Scenario</th>
-                        <th onclick="sortTable(2)" aria-sort="none">Trend Observed</th>
-                        <th onclick="sortTable(3)" aria-sort="none">Upward Close (%)</th>
-                        <th onclick="sortTable(4)" aria-sort="none">Downward Close (%)</th>
-                        <th onclick="sortTable(5)" aria-sort="none">Flat Close (%)</th>
+                        <th onclick="sortTable(0)" aria-sort="none" data-label="Symbol">Symbol</th>
+                        <th onclick="sortTable(1)" aria-sort="none" data-label="Upward Close (%)">Upward<br>Close</th>
+                        <th onclick="sortTable(2)" aria-sort="none" data-label="Downward Close (%)">Downward<br>Close</th>
+                        <th onclick="sortTable(3)" aria-sort="none" data-label="Flat Close (%)">Flat<br>Close</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,14 +44,12 @@
                 </tbody>
             </table>
         </div>
-
         <!-- Export Buttons -->
         <div class="buttons" style="margin-top: 10px;">
             <button class="btn export-btn" id="exportCSV" aria-label="Export CSV">📄 Export CSV</button>
             <button class="btn export-btn" id="exportPDF" aria-label="Export PDF">📑 Export PDF</button>
         </div>
     </div>
-
     <script>
         const jsonDataUrl = "/ticker-data/"; // Updated to dynamic endpoint
 
@@ -62,7 +57,6 @@
         async function fetchData() {
             try {
                 console.log("Fetching data from:", jsonDataUrl);
-
                 const response = await fetch(jsonDataUrl);
                 console.log("Response Status:", response.status); // Check if it's 200
                 console.log("Response Headers:", response.headers);
@@ -71,33 +65,34 @@
                 }
                 const data = await response.json();
                 console.log("Fetched Data:", data); // Debugging the data
-
                 // Handle no-data case
-                if (data.status === "no_data") {
+                if (data.status === "no-data") {
                     document.getElementById("lastUpdated").textContent = data.message;
                     document.querySelector("#marketTable tbody").innerHTML = "";
                     document.getElementById("marketTable").classList.remove("show");
                     document.getElementById("loadingSpinner").style.visibility = "hidden";
                     return;
                 }
-
                 document.getElementById("lastUpdated").textContent = data["Generated on"];
                 const tbody = document.querySelector("#marketTable tbody");
                 tbody.innerHTML = ""; // Clear existing rows
                 data["Tickers"].forEach(ticker => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td>${ticker["Symbol"]}</td>
-                        <td>${ticker["Opening Scenario"]}</td>
-                        <td>${ticker["Trend Observed"]}</td>
-                        <td>${ticker["Upward Close"]}%</td>
-                        <td>${ticker["Downward Close"]}%</td>
-                        <td>${ticker["Flat Close"]}%</td>
+                        <td data-label="Symbol" class="symbol-cell">${ticker["Symbol"]}</td>
+                        <td data-label="Upward Close (%)">${ticker["Upward Close"]}%</td>
+                        <td data-label="Downward Close (%)">${ticker["Downward Close"]}%</td>
+                        <td data-label="Flat Close (%)">${ticker["Flat Close"]}%</td>
                     `;
                     tbody.appendChild(row);
                 });
                 document.getElementById("marketTable").classList.add("show"); // Show the table
-                document.getElementById("loadingSpinner").style.visibility = "hidden"; // Hide spinner
+                // Apply CSS widths dynamically after population
+                const ths = document.querySelectorAll("#marketTable th");
+                ths.forEach((th, index) => {
+                    if (index === 0) th.style.width = "32%";
+                    else th.style.width = "22%";
+                });
             } catch (error) {
                 console.error("Error fetching data:", error);
                 alert("Failed to load data. Please try again.");
@@ -174,6 +169,12 @@
             });
             rows.forEach(row => table.tBodies[0].appendChild(row));
             table.setAttribute("aria-sort", isAscending ? "descending" : "ascending");
+            // Reapply widths after sorting
+            const ths = document.querySelectorAll("#marketTable th");
+            ths.forEach((th, index) => {
+                if (index === 0) th.style.width = "32%";
+                else th.style.width = "22%";
+            });
         }
 
         // Dark Mode Toggle
@@ -185,17 +186,14 @@
         document.getElementById("exportCSV").addEventListener("click", () => {
             const rows = document.querySelectorAll("#marketTable tbody tr");
             let csvContent = "data:text/csv;charset=utf-8,";
-
             // Add header row
-            const headers = ["Symbol", "Opening Scenario", "Trend Observed", "Upward Close (%)", "Downward Close (%)", "Flat Close (%)"];
+            const headers = ["Symbol", "Upward Close (%)", "Downward Close (%)", "Flat Close (%)"];
             csvContent += headers.join(",") + "\n";
-
             // Add data rows
             rows.forEach(row => {
                 const rowData = Array.from(row.cells).map(cell => cell.textContent.replace(/%/g, ""));
                 csvContent += rowData.join(",") + "\n";
             });
-
             // Create and download the CSV file
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
@@ -210,16 +208,14 @@
         document.getElementById("exportPDF").addEventListener("click", () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
             // Extract table data
             const rows = document.querySelectorAll("#marketTable tbody tr");
-            const headers = ["Symbol", "Opening Scenario", "Trend Observed", "Upward Close (%)", "Downward Close (%)", "Flat Close (%)"];
+            const headers = ["Symbol", "Upward Close (%)", "Downward Close (%)", "Flat Close (%)"];
             const data = [];
             rows.forEach(row => {
                 const rowData = Array.from(row.cells).map(cell => cell.textContent.replace(/%/g, ""));
                 data.push(rowData);
             });
-
             // Generate PDF with auto-table
             doc.autoTable({
                 head: [headers],
@@ -231,7 +227,6 @@
                     doc.text("Market Analysis Report", 14, 15);
                 },
             });
-
             // Save the PDF
             doc.save("market_analysis.pdf");
         });
